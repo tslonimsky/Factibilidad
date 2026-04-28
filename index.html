@@ -176,6 +176,8 @@
     width:fit-content; margin-bottom:4px;
   }
   .slide-title { font-family:'DM Serif Display',serif; font-size:30px; color:var(--navy); }
+  .s4 .slide-title { font-size:24px; }
+  .s4 .slide-sub { font-size:11px; }
   .slide-sub { font-size:12px; color:var(--gray); }
   .cards3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; flex:1; }
   .sc {
@@ -197,40 +199,125 @@
   .sc-desc { font-size:11px; color:var(--gray); line-height:1.5; }
   .sc-owner { font-size:10px; color:var(--teal); font-weight:700; margin-top:auto; }
 
-  /* ═══ SLIDE 4 — MAPA CALIDAD ═══ */
-  .s4 { background:var(--bg); display:flex; flex-direction:column; padding:36px 48px; gap:18px; }
-  .s4-legend { display:flex; gap:14px; align-items:center; }
-  .leg { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--gray); }
-  .ld { width:10px; height:10px; border-radius:50%; }
-  .qtable {
-    width:100%; border-collapse:separate; border-spacing:0;
-    background:white; border-radius:12px; overflow:hidden;
-    box-shadow:0 2px 12px rgba(13,43,107,.07);
-    flex:1;
-  }
-  .qtable th {
-    background:var(--navy); color:white;
-    font-size:11px; font-weight:600; letter-spacing:.06em;
-    padding:11px 10px; text-align:center;
-  }
-  .qtable th:first-child { text-align:left; padding-left:18px; }
-  .qtable td {
-    padding:10px; font-size:12px;
-    border-bottom:1px solid var(--line);
-    text-align:center; vertical-align:middle;
-  }
-  .qtable td:first-child {
-    text-align:left; padding-left:18px;
-    font-weight:700; color:var(--navy);
-  }
-  .qtable tr:last-child td { border-bottom:none; }
-  .qtable tr:hover td { background:rgba(238,242,251,.6); }
-  .p { display:inline-block; padding:3px 9px; border-radius:20px; font-size:10px; font-weight:700; }
-  .pr { background:rgba(255,77,109,.12); color:#c0354f; }
-  .py { background:rgba(249,200,70,.18); color:#9a7000; }
-  .pg { background:rgba(34,211,165,.12); color:#169068; }
 
-  /* ═══ SLIDE 5 — HALLAZGOS ═══ */
+  /* ═══ FLIP CARDS GRID ═══ */
+  .flip-grid {
+    display: grid;
+    grid-template-columns: 150px repeat(7, 1fr);
+    grid-template-rows: 30px repeat(5, 1fr);
+    gap: 4px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .grid-header {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--navy);
+    background: white; border-radius: 6px;
+    border: 1px solid var(--line);
+    padding: 0 4px;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .grid-header.row-label {
+    justify-content: flex-start;
+    padding-left: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    background: var(--navy);
+    border: none;
+    border-radius: 7px;
+  }
+  .grid-header.corner {
+    background: var(--navy);
+    border: none;
+  }
+
+  /* Flip card wrapper */
+  .fcard {
+    perspective: 600px;
+    cursor: pointer;
+  }
+  .fcard-inner {
+    position: relative;
+    width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    transition: transform .5s cubic-bezier(.4,0,.2,1);
+  }
+  .fcard.flipped .fcard-inner { transform: rotateY(180deg); }
+
+  .fcard-front, .fcard-back {
+    position: absolute; inset: 0;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border: 1px solid transparent;
+  }
+
+  /* FRONT: colored status pill */
+  .fcard-front {
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px;
+  }
+  .fcard-front.fc-red    { background: rgba(255,77,109,.1);  border-color: rgba(255,77,109,.25); }
+  .fcard-front.fc-yellow { background: rgba(249,200,70,.1);  border-color: rgba(249,200,70,.3); }
+  .fcard-front.fc-green  { background: rgba(34,211,165,.08); border-color: rgba(34,211,165,.2); }
+
+  .fcard-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+  }
+  .fc-red    .fcard-dot { background: #FF4D6D; }
+  .fc-yellow .fcard-dot { background: #F9C846; }
+  .fc-green  .fcard-dot { background: #22D3A5; }
+
+  .fcard-label {
+    font-size: 8.5px; font-weight: 700;
+    text-align: center; line-height: 1.2;
+  }
+  .fc-red    .fcard-label { color: #c0354f; }
+  .fc-yellow .fcard-label { color: #9a7000; }
+  .fc-green  .fcard-label { color: #169068; }
+
+  /* BACK: explanation */
+  .fcard-back {
+    transform: rotateY(180deg);
+    padding: 6px;
+    text-align: center;
+    font-size: 9px;
+    line-height: 1.35;
+    color: white;
+    font-weight: 500;
+  }
+  .fc-red    + .fcard-back, .fcard-back.back-red    { background: #c0354f; border-color: #c0354f; }
+  .fcard-back.back-red    { background: #c0354f; border-color: #c0354f; }
+  .fcard-back.back-yellow { background: #9a7000; border-color: #9a7000; }
+  .fcard-back.back-green  { background: #169068; border-color: #169068; }
+
+  /* Reset all button */
+  .flip-reset {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--gray); cursor: pointer;
+    background: none; border: none;
+    font-family: inherit;
+    margin-left: auto;
+  }
+  .flip-reset:hover { color: var(--teal); }
+
+
+  /* ═══ SLIDE 4 — MAPA CALIDAD ═══ */
+  .s4 {
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    padding: 32px 44px 28px;
+    gap: 14px;
+  }
+
+/* ═══ SLIDE 5 — HALLAZGOS ═══ */
   .s5 { background:white; display:grid; grid-template-columns:180px 1fr; }
   .s5-left {
     background:var(--navy);
@@ -440,81 +527,11 @@
     <div class="sh">
       <div class="sec-tag">Sección 2 — Evaluación</div>
       <div class="slide-title">¿Qué tan buenos son los datos?</div>
+      <div class="slide-sub">Hacé click en cada tarjeta para ver qué encontramos</div>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div style="font-size:12px;color:var(--gray)">Evaluación por fuente y dimensión de calidad</div>
-      <div class="s4-legend">
-        <div class="leg"><div class="ld" style="background:#c0354f"></div>Crítico — bloquea el modelo</div>
-        <div class="leg"><div class="ld" style="background:#9a7000"></div>Menor — requiere atención</div>
-        <div class="leg"><div class="ld" style="background:#169068"></div>OK</div>
-      </div>
-    </div>
-    <table class="qtable">
-      <thead>
-        <tr>
-          <th>Fuente</th>
-          <th>Completitud</th>
-          <th>Consistencia</th>
-          <th>Exactitud</th>
-          <th>Actualidad</th>
-          <th>Trazabilidad</th>
-          <th>Validez</th>
-          <th>Unicidad</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>POS / Ventas</td>
-          <td><span class="p pr">Crítico</span></td>
-          <td><span class="p py">Menor</span></td>
-          <td><span class="p py">Menor</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pr">Crítico</span></td>
-          <td><span class="p pr">Crítico</span></td>
-        </tr>
-        <tr>
-          <td>E-commerce</td>
-          <td><span class="p py">Menor</span></td>
-          <td><span class="p py">Menor</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pg">OK</span></td>
-        </tr>
-        <tr>
-          <td>Promociones</td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p py">Menor</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pg">OK</span></td>
-        </tr>
-        <tr>
-          <td>Inventario</td>
-          <td><span class="p py">Menor</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p py">Menor</span></td>
-          <td><span class="p pg">OK</span></td>
-        </tr>
-        <tr>
-          <td>Sist. Contable</td>
-          <td><span class="p pr">Crítico</span></td>
-          <td><span class="p pr">Crítico</span></td>
-          <td><span class="p pr">Crítico</span></td>
-          <td><span class="p pg">OK</span></td>
-          <td><span class="p pr">Crítico</span></td>
-          <td><span class="p pr">Crítico</span></td>
-          <td><span class="p py">Menor</span></td>
-        </tr>
-      </tbody>
-    </table>
+
+    <!-- FLIP CARD GRID: 5 fuentes × 7 dimensiones = 35 tarjetas -->
+    <div class="flip-grid" id="flipGrid"></div>
   </div>
 
   <!-- ── 5. HALLAZGOS ── -->
@@ -712,6 +729,115 @@
     if(e.key==='ArrowRight'||e.key===' ') { e.preventDefault(); if(cur<slides.length-1) go(cur+1); }
     if(e.key==='ArrowLeft') { e.preventDefault(); if(cur>0) go(cur-1); }
   });
+
+  // ── FLIP GRID DATA ──────────────────────────────────────────────────────
+  const cols = ['Completitud','Consistencia','Exactitud','Actualidad','Trazabilidad','Validez','Unicidad'];
+
+  const rows = [
+    {
+      label: 'POS / Ventas',
+      cells: [
+        { s:'red',   t:'Crítico', b:'No hay costo de producto vinculado → imposible calcular margen.' },
+        { s:'yellow',t:'Menor',   b:'IDs de tienda en 2 formatos distintos (T01 y S001) entre sistemas.' },
+        { s:'yellow',t:'Menor',   b:'Ventas netas negativas sin identificar como devoluciones.' },
+        { s:'green', t:'OK',      b:'Datos del año en curso, actualizados diariamente.' },
+        { s:'green', t:'OK',      b:'Se puede rastrear el origen de cada registro de venta.' },
+        { s:'red',   t:'Crítico', b:'99,96% de las ventas tienen descuento_pct = 0. Las promociones no se registran.' },
+        { s:'red',   t:'Crítico', b:'Solo 7 de 14.620 filas tienen promo_id. El sistema no vincula ventas a campañas.' },
+      ]
+    },
+    {
+      label: 'E-commerce',
+      cells: [
+        { s:'yellow',t:'Menor',   b:'No cubre el período 2022-2023. Solo hay datos desde 2024.' },
+        { s:'yellow',t:'Menor',   b:'IDs de tienda distintos al POS físico. No se puede cruzar directamente.' },
+        { s:'green', t:'OK',      b:'Precios y descuentos verificados sin errores de cálculo.' },
+        { s:'green', t:'OK',      b:'Datos actualizados en tiempo real.' },
+        { s:'green', t:'OK',      b:'Origen de datos claro y trazable.' },
+        { s:'green', t:'OK',      b:'Sin valores inválidos ni fuera de rango.' },
+        { s:'green', t:'OK',      b:'Sin duplicados. Cada orden es única.' },
+      ]
+    },
+    {
+      label: 'Promociones',
+      cells: [
+        { s:'green', t:'OK',      b:'Todas las campañas tienen campos completos.' },
+        { s:'green', t:'OK',      b:'IDs de promoción consistentes en el sistema.' },
+        { s:'green', t:'OK',      b:'Valores de descuento dentro de rangos válidos.' },
+        { s:'green', t:'OK',      b:'Historial disponible desde 2022.' },
+        { s:'yellow',t:'Menor',   b:'Historial pre-2022 incompleto o no estructurado. No se puede aprender de campañas antiguas.' },
+        { s:'green', t:'OK',      b:'Sin valores imposibles ni fuera de rango.' },
+        { s:'green', t:'OK',      b:'Sin campañas duplicadas.' },
+      ]
+    },
+    {
+      label: 'Inventario',
+      cells: [
+        { s:'yellow',t:'Menor',   b:'175 registros con stock_disponible en blanco en el archivo 2024-2025.' },
+        { s:'green', t:'OK',      b:'IDs de tienda y producto consistentes con el maestro.' },
+        { s:'green', t:'OK',      b:'Valores de stock dentro de rango lógico (15 a 251 unidades).' },
+        { s:'green', t:'OK',      b:'Datos disponibles hasta 2025.' },
+        { s:'green', t:'OK',      b:'Se puede rastrear el origen de cada registro de stock.' },
+        { s:'yellow',t:'Menor',   b:'ONL tenía el doble de filas por error de exportación. Resuelto con promedio.' },
+        { s:'green', t:'OK',      b:'Sin duplicados tras limpieza de ONL.' },
+      ]
+    },
+    {
+      label: 'Sist. Contable',
+      cells: [
+        { s:'red',   t:'Crítico', b:'Costos_Productos.csv con filas rotas: IDs perdidos, datos desplazados. No se puede calcular margen.' },
+        { s:'red',   t:'Crítico', b:'Presupuesto usa T01-T15, resto usa S001-S028. Sin tabla de mapeo no se puede cruzar.' },
+        { s:'red',   t:'Crítico', b:'Valores de inversión promocional truncados (ej: "87" en lugar de "87.000").' },
+        { s:'green', t:'OK',      b:'Presupuestos del período disponibles.' },
+        { s:'red',   t:'Crítico', b:'No hay dimensión temporal en los costos. No se puede saber el costo en un mes específico.' },
+        { s:'red',   t:'Crítico', b:'El margen bruto real por tienda no existe como dato calculable en ningún sistema.' },
+        { s:'yellow',t:'Menor',   b:'Algunos productos aparecen con nombre duplicado en el maestro.' },
+      ]
+    },
+  ];
+
+  const grid = document.getElementById('flipGrid');
+  if (grid) {
+    // Corner
+    const corner = document.createElement('div');
+    corner.className = 'grid-header corner';
+    grid.appendChild(corner);
+
+    // Column headers
+    cols.forEach(c => {
+      const h = document.createElement('div');
+      h.className = 'grid-header';
+      h.textContent = c;
+      grid.appendChild(h);
+    });
+
+    // Row data
+    rows.forEach(row => {
+      // Row label
+      const rl = document.createElement('div');
+      rl.className = 'grid-header row-label';
+      rl.textContent = row.label;
+      grid.appendChild(rl);
+
+      // Cells
+      row.cells.forEach((cell, ci) => {
+        const card = document.createElement('div');
+        card.className = 'fcard';
+        card.innerHTML = `
+          <div class="fcard-inner">
+            <div class="fcard-front fc-${cell.s}">
+              <div class="fcard-dot"></div>
+              <div class="fcard-label">${cell.t}</div>
+            </div>
+            <div class="fcard-back back-${cell.s}">${cell.b}</div>
+          </div>`;
+        card.addEventListener('click', () => card.classList.toggle('flipped'));
+        grid.appendChild(card);
+      });
+    });
+  }
+
+
 </script>
 </body>
 </html>
