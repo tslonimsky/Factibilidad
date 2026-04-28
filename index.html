@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casa Óga — Entregable 2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D2B6B;
+    --teal: #00B4C8;
+    --teal-l: #7FE5EA;
+    --bg: #EEF2FB;
+    --white: #FFFFFF;
+    --gray: #8A9BB5;
+    --line: #D4E4FF;
+    --red: #FF4D6D;
+    --yellow: #F9C846;
+    --green: #22D3A5;
+    --orange: #F4845F;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #111827;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .deck {
+    width: 960px;
+    height: 540px;
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 40px 100px rgba(0,0,0,.6);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity .4s ease, transform .4s ease;
+    pointer-events: none;
+  }
+  .slide.active { opacity:1; transform:translateX(0); pointer-events:all; }
+  .slide.exit   { opacity:0; transform:translateX(-50px); }
+
+  /* CONTROLS */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .btn {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.15);
+    background: rgba(255,255,255,.07);
+    color: white;
+    font-size: 17px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s, transform .15s;
+    backdrop-filter: blur(6px);
+  }
+  .btn:hover:not(:disabled) { background: rgba(0,180,200,.35); transform: scale(1.1); }
+  .btn:disabled { opacity: .25; cursor: default; }
+  .dots { display: flex; gap: 7px; }
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.22);
+    cursor: pointer;
+    transition: background .2s, transform .2s;
+  }
+  .dot.active { background: var(--teal); transform: scale(1.4); }
+  .counter { font-size: 12px; color: rgba(255,255,255,.3); min-width: 48px; text-align:center; }
+  .hint { font-size: 11px; color: rgba(255,255,255,.2); }
+
+  /* ═══ SLIDE 1 — COVER ═══ */
+  .s1 { background: var(--navy); }
+  .s1::before {
+    content:''; position:absolute;
+    width:520px; height:520px;
+    background: radial-gradient(circle, rgba(0,180,200,.22) 0%, transparent 70%);
+    top:-140px; right:-100px; border-radius:50%;
+  }
+  .s1-body {
+    position: relative; z-index:1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 52px 64px;
+  }
+  .s1-top { display:flex; align-items:center; justify-content:space-between; }
+  .logo { font-family:'DM Serif Display',serif; font-size:18px; color:white; }
+  .logo span { color:var(--teal); }
+  .badge {
+    font-size:11px; font-weight:600; letter-spacing:.1em;
+    color:rgba(255,255,255,.4);
+    border:1px solid rgba(255,255,255,.1);
+    padding:5px 14px; border-radius:20px;
+  }
+  .s1-mid { display:flex; flex-direction:column; gap:16px; }
+  .eyebrow {
+    font-size:11px; font-weight:700; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--teal);
+  }
+  .big-title {
+    font-family:'DM Serif Display',serif;
+    font-size:72px; line-height:.95;
+    color:white;
+  }
+  .big-title em { color:var(--teal-l); font-style:italic; }
+  .sub { font-size:16px; color:rgba(255,255,255,.45); font-weight:300; max-width:440px; line-height:1.6; }
+  .s1-bot {
+    display:flex; align-items:center; justify-content:space-between;
+    border-top:1px solid rgba(255,255,255,.1);
+    padding-top:20px;
+  }
+  .team { display:flex; gap:28px; }
+  .person .name { font-size:12px; font-weight:600; color:white; }
+  .person .role { font-size:11px; color:rgba(255,255,255,.35); margin-top:2px; }
+  .s1-date { font-size:11px; color:rgba(255,255,255,.25); }
+
+  /* ═══ SLIDE 2 — QUÉ ES ESTE DOC ═══ */
+  .s2 { background:var(--bg); display:grid; grid-template-columns:260px 1fr; }
+  .s2-left {
+    background:var(--navy);
+    display:flex; flex-direction:column; justify-content:center;
+    padding:48px 36px; gap:16px;
+  }
+  .s2-left .sec { font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--teal); }
+  .s2-left .heading { font-family:'DM Serif Display',serif; font-size:36px; color:white; line-height:1.15; }
+  .s2-left .body-text { font-size:13px; color:rgba(255,255,255,.45); line-height:1.7; font-weight:300; }
+  .s2-right {
+    display:flex; flex-direction:column; justify-content:center;
+    padding:48px 52px; gap:14px;
+  }
+  .agenda-row {
+    display:flex; align-items:center; gap:16px;
+    padding:14px 16px; border-radius:10px;
+    background:white;
+    border:1px solid var(--line);
+    transition:transform .2s;
+  }
+  .agenda-row:hover { transform:translateX(4px); }
+  .anum {
+    width:30px; height:30px; border-radius:50%;
+    background:var(--navy); color:white;
+    font-size:12px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .atext .at { font-size:14px; font-weight:700; color:var(--navy); }
+  .atext .as { font-size:11px; color:var(--gray); margin-top:1px; }
+
+  /* ═══ SLIDE 3 — INVENTARIO ═══ */
+  .s3 { background:var(--bg); display:flex; flex-direction:column; padding:40px 52px; gap:24px; }
+  .sh { display:flex; flex-direction:column; gap:4px; }
+  .sec-tag {
+    display:inline-block;
+    font-size:10px; font-weight:700; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--teal);
+    background:rgba(0,180,200,.1);
+    padding:3px 10px; border-radius:20px;
+    width:fit-content; margin-bottom:4px;
+  }
+  .slide-title { font-family:'DM Serif Display',serif; font-size:30px; color:var(--navy); }
+  .slide-sub { font-size:12px; color:var(--gray); }
+  .cards3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; flex:1; }
+  .sc {
+    background:white; border-radius:10px;
+    padding:18px 20px;
+    display:flex; flex-direction:column; gap:6px;
+    border:1px solid var(--line);
+    transition:transform .2s, box-shadow .2s;
+  }
+  .sc:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(13,43,107,.1); }
+  .sc-top { display:flex; align-items:center; justify-content:space-between; }
+  .sc-icon { font-size:22px; }
+  .freq {
+    font-size:10px; font-weight:700;
+    background:var(--bg); color:var(--gray);
+    padding:2px 8px; border-radius:10px;
+  }
+  .sc-name { font-size:13px; font-weight:700; color:var(--navy); }
+  .sc-desc { font-size:11px; color:var(--gray); line-height:1.5; }
+  .sc-owner { font-size:10px; color:var(--teal); font-weight:700; margin-top:auto; }
+
+  /* ═══ SLIDE 4 — MAPA CALIDAD ═══ */
+  .s4 { background:var(--bg); display:flex; flex-direction:column; padding:36px 48px; gap:18px; }
+  .s4-legend { display:flex; gap:14px; align-items:center; }
+  .leg { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--gray); }
+  .ld { width:10px; height:10px; border-radius:50%; }
+  .qtable {
+    width:100%; border-collapse:separate; border-spacing:0;
+    background:white; border-radius:12px; overflow:hidden;
+    box-shadow:0 2px 12px rgba(13,43,107,.07);
+    flex:1;
+  }
+  .qtable th {
+    background:var(--navy); color:white;
+    font-size:11px; font-weight:600; letter-spacing:.06em;
+    padding:11px 10px; text-align:center;
+  }
+  .qtable th:first-child { text-align:left; padding-left:18px; }
+  .qtable td {
+    padding:10px; font-size:12px;
+    border-bottom:1px solid var(--line);
+    text-align:center; vertical-align:middle;
+  }
+  .qtable td:first-child {
+    text-align:left; padding-left:18px;
+    font-weight:700; color:var(--navy);
+  }
+  .qtable tr:last-child td { border-bottom:none; }
+  .qtable tr:hover td { background:rgba(238,242,251,.6); }
+  .p { display:inline-block; padding:3px 9px; border-radius:20px; font-size:10px; font-weight:700; }
+  .pr { background:rgba(255,77,109,.12); color:#c0354f; }
+  .py { background:rgba(249,200,70,.18); color:#9a7000; }
+  .pg { background:rgba(34,211,165,.12); color:#169068; }
+
+  /* ═══ SLIDE 5 — HALLAZGOS ═══ */
+  .s5 { background:white; display:grid; grid-template-columns:180px 1fr; }
+  .s5-left {
+    background:var(--navy);
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    padding:32px 24px; gap:8px; text-align:center;
+  }
+  .big-n { font-family:'DM Serif Display',serif; font-size:96px; color:var(--teal); line-height:1; }
+  .s5-left-lbl { font-size:14px; font-weight:700; color:white; line-height:1.4; }
+  .s5-left-sub { font-size:11px; color:rgba(255,255,255,.4); line-height:1.5; margin-top:4px; }
+  .s5-right { padding:32px 40px; display:flex; flex-direction:column; gap:10px; }
+  .s5-title { font-family:'DM Serif Display',serif; font-size:24px; color:var(--navy); margin-bottom:4px; }
+  .fi {
+    display:flex; align-items:flex-start; gap:14px;
+    padding:11px 14px; border-radius:8px;
+    border-left:3px solid transparent;
+  }
+  .fi:hover { background:var(--bg); }
+  .fi.c { border-color:var(--red); }
+  .fi.w { border-color:var(--yellow); }
+  .fb {
+    width:22px; height:22px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; font-weight:800; flex-shrink:0; margin-top:1px;
+  }
+  .fb.r { background:rgba(255,77,109,.15); color:var(--red); }
+  .fb.y { background:rgba(249,200,70,.2); color:#9a7000; }
+  .fc { display:flex; flex-direction:column; gap:3px; }
+  .ft { font-size:13px; font-weight:700; color:var(--navy); }
+  .fd { font-size:11.5px; color:var(--gray); line-height:1.5; }
+
+  /* ═══ SLIDE 6 — PLAN ═══ */
+  .s6 { background:var(--bg); display:flex; flex-direction:column; padding:36px 52px; gap:18px; }
+  .pgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; flex:1; }
+  .pc {
+    background:white; border-radius:10px;
+    padding:16px 18px;
+    display:flex; flex-direction:column; gap:8px;
+    border:1px solid var(--line);
+  }
+  .pc-top { display:flex; align-items:center; gap:10px; }
+  .pnum {
+    width:26px; height:26px; border-radius:7px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:800; color:white; flex-shrink:0;
+  }
+  .pissue { font-size:12px; font-weight:700; color:var(--navy); line-height:1.3; }
+  .paction { font-size:11px; color:var(--gray); line-height:1.6; flex:1; }
+  .pfoot {
+    display:flex; align-items:center; justify-content:space-between;
+    padding-top:8px; border-top:1px solid var(--line);
+  }
+  .porigin { font-size:10px; color:var(--gray); }
+  .powner { font-size:10px; color:var(--teal); font-weight:700; }
+
+  /* ═══ SLIDE 7 — PRÓXIMOS PASOS ═══ */
+  .s7 { background:var(--navy); overflow:hidden; }
+  .s7::before {
+    content:''; position:absolute;
+    width:600px; height:600px;
+    background:radial-gradient(circle, rgba(0,180,200,.18) 0%, transparent 65%);
+    top:-200px; right:-180px; border-radius:50%;
+  }
+  .s7-body {
+    position:relative; z-index:1;
+    height:100%;
+    display:flex;
+    padding:52px 64px;
+    gap:56px;
+    align-items:center;
+  }
+  .s7-left { flex:0 0 260px; display:flex; flex-direction:column; gap:16px; }
+  .s7-eyebrow { font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--teal); }
+  .s7-title { font-family:'DM Serif Display',serif; font-size:48px; color:white; line-height:1.05; }
+  .s7-title em { color:var(--teal-l); font-style:italic; }
+  .s7-desc { font-size:13px; color:rgba(255,255,255,.45); line-height:1.7; font-weight:300; }
+  .s7-right { flex:1; display:flex; flex-direction:column; gap:12px; }
+  .ns {
+    display:flex; align-items:flex-start; gap:18px;
+    padding:14px 18px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:10px;
+    transition:background .2s;
+  }
+  .ns:hover { background:rgba(255,255,255,.09); }
+  .nsn { font-family:'DM Serif Display',serif; font-size:30px; color:var(--teal); line-height:1; flex-shrink:0; min-width:36px; }
+  .nsc { display:flex; flex-direction:column; gap:3px; }
+  .nst { font-size:14px; font-weight:700; color:white; }
+  .nsd { font-size:12px; color:rgba(255,255,255,.42); line-height:1.5; }
+  .nstag {
+    display:inline-block; margin-top:4px;
+    font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    padding:2px 8px; border-radius:10px;
+    background:rgba(0,180,200,.18); color:var(--teal);
+  }
+  .nstag.bl { background:rgba(255,77,109,.18); color:#ff8099; }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- ── 1. COVER ── -->
+  <div class="slide s1 active">
+    <div class="s1-body">
+      <div class="s1-top">
+        <div class="logo">Casa <span>Óga</span></div>
+        <div class="badge">ITBA · 1C 2026</div>
+      </div>
+      <div class="s1-mid">
+        <div class="eyebrow">Entregable Nro. 2 · 24 de Abril de 2026</div>
+        <div class="big-title">Calidad<br>de <em>Datos</em></div>
+        <div class="sub">Inventario, evaluación y plan de mejora de las fuentes de datos para el modelo predictivo de rentabilidad.</div>
+      </div>
+      <div class="s1-bot">
+        <div class="team">
+          <div class="person"><div class="name">Juanita Labourt</div><div class="role">Model Validation Lead</div></div>
+          <div class="person"><div class="name">Sofia Berardo López</div><div class="role">Business Insights Analyst</div></div>
+          <div class="person"><div class="name">Tomas Slonimsky</div><div class="role">Model Development</div></div>
+          <div class="person"><div class="name">Máximo Demichelis</div><div class="role">Executive Presentation</div></div>
+        </div>
+        <div class="s1-date">Factibilidad de Proyectos Data Driven</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. AGENDA ── -->
+  <div class="slide s2">
+    <div class="s2-left">
+      <div class="sec">Contenido</div>
+      <div class="heading">¿Qué<br>vamos a<br>ver?</div>
+      <div class="body-text">Diagnóstico completo de los datos disponibles para construir el modelo predictivo de Casa Óga.</div>
+    </div>
+    <div class="s2-right">
+      <div class="agenda-row">
+        <div class="anum">1</div>
+        <div class="atext"><div class="at">Inventario de fuentes</div><div class="as">¿Con qué datos contamos?</div></div>
+      </div>
+      <div class="agenda-row">
+        <div class="anum" style="background:var(--teal)">2</div>
+        <div class="atext"><div class="at">Mapa de calidad</div><div class="as">¿Qué tan buenos son esos datos?</div></div>
+      </div>
+      <div class="agenda-row">
+        <div class="anum">3</div>
+        <div class="atext"><div class="at">Hallazgos críticos</div><div class="as">¿Qué problemas bloquean el modelo?</div></div>
+      </div>
+      <div class="agenda-row">
+        <div class="anum">4</div>
+        <div class="atext"><div class="at">Plan de mejora</div><div class="as">¿Cómo los resolvemos?</div></div>
+      </div>
+      <div class="agenda-row">
+        <div class="anum">5</div>
+        <div class="atext"><div class="at">Próximos pasos</div><div class="as">¿Qué necesitamos para el Entregable 3?</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. INVENTARIO ── -->
+  <div class="slide s3">
+    <div class="sh">
+      <div class="sec-tag">Sección 1 — Inventario</div>
+      <div class="slide-title">¿Con qué datos contamos?</div>
+      <div class="slide-sub">6 sistemas internos identificados · Ninguno está integrado con los demás</div>
+    </div>
+    <div class="cards3">
+      <div class="sc">
+        <div class="sc-top"><div class="sc-icon">🏪</div><div class="freq">Diario</div></div>
+        <div class="sc-name">POS / Ventas</div>
+        <div class="sc-desc">Ventas por tienda, ticket y producto. Dataset central del modelo.</div>
+        <div class="sc-owner">TI / Operaciones</div>
+      </div>
+      <div class="sc">
+        <div class="sc-top"><div class="sc-icon">🛒</div><div class="freq">Diario</div></div>
+        <div class="sc-name">E-commerce</div>
+        <div class="sc-desc">Órdenes, precios y descuentos del canal online.</div>
+        <div class="sc-owner">TI / Comercial</div>
+      </div>
+      <div class="sc">
+        <div class="sc-top"><div class="sc-icon">🎯</div><div class="freq">Manual</div></div>
+        <div class="sc-name">Promociones</div>
+        <div class="sc-desc">Campañas, tiendas donde aplica, descuentos y vigencia.</div>
+        <div class="sc-owner">Dirección Comercial</div>
+      </div>
+      <div class="sc">
+        <div class="sc-top"><div class="sc-icon">📦</div><div class="freq">Mensual</div></div>
+        <div class="sc-name">Inventario</div>
+        <div class="sc-desc">Stock por SKU y tienda, rotación. No integrado con POS.</div>
+        <div class="sc-owner">Operaciones</div>
+      </div>
+      <div class="sc">
+        <div class="sc-top"><div class="sc-icon">💰</div><div class="freq">Mensual</div></div>
+        <div class="sc-name">Sistema Contable</div>
+        <div class="sc-desc">Presupuesto y costo de referencia por producto. Sin historial temporal.</div>
+        <div class="sc-owner">Dirección Financiera</div>
+      </div>
+      <div class="sc">
+        <div class="sc-top"><div class="sc-icon">📊</div><div class="freq">Semanal</div></div>
+        <div class="sc-name">Excel manual</div>
+        <div class="sc-desc">Consolidación de KPIs: ventas, margen, stock. Hecho a mano por Comercial.</div>
+        <div class="sc-owner">Dirección Comercial</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. MAPA CALIDAD ── -->
+  <div class="slide s4">
+    <div class="sh">
+      <div class="sec-tag">Sección 2 — Evaluación</div>
+      <div class="slide-title">¿Qué tan buenos son los datos?</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:12px;color:var(--gray)">Evaluación por fuente y dimensión de calidad</div>
+      <div class="s4-legend">
+        <div class="leg"><div class="ld" style="background:#c0354f"></div>Crítico — bloquea el modelo</div>
+        <div class="leg"><div class="ld" style="background:#9a7000"></div>Menor — requiere atención</div>
+        <div class="leg"><div class="ld" style="background:#169068"></div>OK</div>
+      </div>
+    </div>
+    <table class="qtable">
+      <thead>
+        <tr>
+          <th>Fuente</th>
+          <th>Completitud</th>
+          <th>Consistencia</th>
+          <th>Exactitud</th>
+          <th>Actualidad</th>
+          <th>Trazabilidad</th>
+          <th>Validez</th>
+          <th>Unicidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>POS / Ventas</td>
+          <td><span class="p pr">Crítico</span></td>
+          <td><span class="p py">Menor</span></td>
+          <td><span class="p py">Menor</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pr">Crítico</span></td>
+          <td><span class="p pr">Crítico</span></td>
+        </tr>
+        <tr>
+          <td>E-commerce</td>
+          <td><span class="p py">Menor</span></td>
+          <td><span class="p py">Menor</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pg">OK</span></td>
+        </tr>
+        <tr>
+          <td>Promociones</td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p py">Menor</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pg">OK</span></td>
+        </tr>
+        <tr>
+          <td>Inventario</td>
+          <td><span class="p py">Menor</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p py">Menor</span></td>
+          <td><span class="p pg">OK</span></td>
+        </tr>
+        <tr>
+          <td>Sist. Contable</td>
+          <td><span class="p pr">Crítico</span></td>
+          <td><span class="p pr">Crítico</span></td>
+          <td><span class="p pr">Crítico</span></td>
+          <td><span class="p pg">OK</span></td>
+          <td><span class="p pr">Crítico</span></td>
+          <td><span class="p pr">Crítico</span></td>
+          <td><span class="p py">Menor</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── 5. HALLAZGOS ── -->
+  <div class="slide s5">
+    <div class="s5-left">
+      <div class="big-n">5</div>
+      <div class="s5-left-lbl">Issues críticos encontrados</div>
+      <div class="s5-left-sub">Problemas que bloquean o degradan el modelo predictivo.</div>
+    </div>
+    <div class="s5-right">
+      <div class="s5-title">¿Qué problemas bloqueantes hay?</div>
+      <div class="fi c">
+        <div class="fb r">1</div>
+        <div class="fc">
+          <div class="ft">Costos fragmentados — no se puede calcular margen</div>
+          <div class="fd">Costos_Productos.csv tiene filas rotas con IDs perdidos. Sin costo unitario no hay margen bruto.</div>
+        </div>
+      </div>
+      <div class="fi c">
+        <div class="fb r">2</div>
+        <div class="fc">
+          <div class="ft">IDs de tienda incompatibles entre sistemas</div>
+          <div class="fd">Presupuesto usa T01–T15, el resto usa S001–S028. No se pueden cruzar sin tabla de mapeo.</div>
+        </div>
+      </div>
+      <div class="fi c">
+        <div class="fb r">3</div>
+        <div class="fc">
+          <div class="ft">Valores de inversión promocional truncados</div>
+          <div class="fd">Campos con "87" donde deberían ser 5-6 cifras. Imposible calcular ROI de campañas.</div>
+        </div>
+      </div>
+      <div class="fi c">
+        <div class="fb r">4</div>
+        <div class="fc">
+          <div class="ft">Ventas netas negativas sin explicación</div>
+          <div class="fd">Registros con venta_neta negativa no marcados como devolución. Sesga todos los KPIs.</div>
+        </div>
+      </div>
+      <div class="fi w">
+        <div class="fb y">5</div>
+        <div class="fc">
+          <div class="ft">Catálogo de productos con categorías rotas y precios incompletos</div>
+          <div class="fd">Ej: "Decor" en una fila y "ación" en la siguiente. Precios que terminan en punto.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 6. PLAN ── -->
+  <div class="slide s6">
+    <div class="sh">
+      <div class="sec-tag">Sección 3 — Plan de Mejora</div>
+      <div class="slide-title">¿Cómo lo resolvemos?</div>
+      <div class="slide-sub">Acción concreta por cada hallazgo · Responsable asignado</div>
+    </div>
+    <div class="pgrid">
+      <div class="pc">
+        <div class="pc-top">
+          <div class="pnum" style="background:var(--red)">1</div>
+          <div class="pissue">Costos_Productos.csv roto</div>
+        </div>
+        <div class="paction">Limpiar archivo: unir filas fragmentadas y reconstruir IDs. Normalizar proceso de exportación del sistema contable.</div>
+        <div class="pfoot"><div class="porigin">Sist. Contable</div><div class="powner">Contralor / DBA</div></div>
+      </div>
+      <div class="pc">
+        <div class="pc-top">
+          <div class="pnum" style="background:var(--red)">2</div>
+          <div class="pissue">IDs de tienda incompatibles</div>
+        </div>
+        <div class="paction">Crear tabla de equivalencias T01 → S001. Estandarizar todos los datasets al mismo formato.</div>
+        <div class="pfoot"><div class="porigin">Sist. Contable</div><div class="powner">Analista FP&A</div></div>
+      </div>
+      <div class="pc">
+        <div class="pc-top">
+          <div class="pnum" style="background:var(--red)">3</div>
+          <div class="pissue">Inversión promocional truncada</div>
+        </div>
+        <div class="paction">Auditar campaña ONL2024017. Recalcular costo_total sumando marketing, logística y operaciones.</div>
+        <div class="pfoot"><div class="porigin">Promociones</div><div class="powner">Gerente Marketing</div></div>
+      </div>
+      <div class="pc">
+        <div class="pc-top">
+          <div class="pnum" style="background:var(--orange)">4</div>
+          <div class="pissue">Ventas negativas</div>
+        </div>
+        <div class="paction">Agregar campo "Tipo de Transacción" para separar ventas de devoluciones en el POS.</div>
+        <div class="pfoot"><div class="porigin">POS / Ventas</div><div class="powner">Operaciones Retail</div></div>
+      </div>
+      <div class="pc">
+        <div class="pc-top">
+          <div class="pnum" style="background:var(--yellow)">5</div>
+          <div class="pissue">Catálogo de productos roto</div>
+        </div>
+        <div class="paction">Unir categorías fragmentadas. Completar precios con 2 decimales. Validar contra lista oficial.</div>
+        <div class="pfoot"><div class="porigin">Maestro Productos</div><div class="powner">Analista Datos</div></div>
+      </div>
+      <div class="pc">
+        <div class="pc-top">
+          <div class="pnum" style="background:var(--teal)">6</div>
+          <div class="pissue">Costos sin historial temporal</div>
+        </div>
+        <div class="paction">Usar costo_referencia como proxy inicial. Completar nulos con promedio de categoría. Umbral: 25% margen.</div>
+        <div class="pfoot"><div class="porigin">Sist. Contable</div><div class="powner">Analista Contable</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 7. PRÓXIMOS PASOS ── -->
+  <div class="slide s7">
+    <div class="s7-body">
+      <div class="s7-left">
+        <div class="s7-eyebrow">Lo que sigue</div>
+        <div class="s7-title">Próximos<br><em>pasos</em></div>
+        <div class="s7-desc">Para poder construir el modelo en el Entregable 3, necesitamos resolver primero estos 4 puntos.</div>
+      </div>
+      <div class="s7-right">
+        <div class="ns">
+          <div class="nsn">01</div>
+          <div class="nsc">
+            <div class="nst">Conseguir tabla de mapeo T01 ↔ S001</div>
+            <div class="nsd">Sin esto no se pueden cruzar ventas, stock y presupuesto en un mismo análisis.</div>
+            <span class="nstag bl">Bloqueante</span>
+          </div>
+        </div>
+        <div class="ns">
+          <div class="nsn">02</div>
+          <div class="nsc">
+            <div class="nst">Recibir Costos_Productos.csv limpio y completo</div>
+            <div class="nsd">Con ese archivo podemos calcular el margen estimado y definir cuándo una tienda "falla" (umbral 25%).</div>
+            <span class="nstag bl">Bloqueante</span>
+          </div>
+        </div>
+        <div class="ns">
+          <div class="nsn">03</div>
+          <div class="nsc">
+            <div class="nst">Construir la tabla analítica tienda × mes</div>
+            <div class="nsd">Integrar todos los datasets en una sola tabla. Es la base sobre la que corre el modelo.</div>
+            <span class="nstag">Sprint 1</span>
+          </div>
+        </div>
+        <div class="ns">
+          <div class="nsn">04</div>
+          <div class="nsc">
+            <div class="nst">EDA y construcción de variables del modelo</div>
+            <div class="nsd">Explorar la tabla integrada e identificar qué variables predicen mejor el margen bajo.</div>
+            <span class="nstag">Sprint 2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<div class="controls">
+  <button class="btn" id="prev" disabled>←</button>
+  <div class="dots" id="dots"></div>
+  <button class="btn" id="next">→</button>
+  <div class="counter" id="ctr">1 / 7</div>
+</div>
+<div class="hint">← → para navegar · click en los puntos para saltar</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  const ctr    = document.getElementById('ctr');
+  const prev   = document.getElementById('prev');
+  const next   = document.getElementById('next');
+  let cur = 0;
+
+  slides.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===0?' active':'');
+    d.onclick = () => go(i);
+    dotsEl.appendChild(d);
+  });
+
+  function go(n) {
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    const old = cur;
+    setTimeout(() => slides[old].classList.remove('exit'), 400);
+    cur = n;
+    slides[cur].classList.add('active');
+    document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===cur));
+    ctr.textContent = `${cur+1} / ${slides.length}`;
+    prev.disabled = cur===0;
+    next.disabled = cur===slides.length-1;
+  }
+
+  prev.onclick = () => { if(cur>0) go(cur-1); };
+  next.onclick = () => { if(cur<slides.length-1) go(cur+1); };
+  document.addEventListener('keydown', e => {
+    if(e.key==='ArrowRight'||e.key===' ') { e.preventDefault(); if(cur<slides.length-1) go(cur+1); }
+    if(e.key==='ArrowLeft') { e.preventDefault(); if(cur>0) go(cur-1); }
+  });
+</script>
+</body>
+</html>
